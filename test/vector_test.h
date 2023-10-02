@@ -56,6 +56,17 @@ TEST(vector_copy) {
 	EXPECT_CON_EQ(exp2, act2);
 }
 
+TEST(vector_insert) {
+	std::vector<int> exp(5, 3);
+	mystl::Vector<int> act(5, 3);
+	exp.insert(exp.begin() + 1, 12);
+	act.insert(act.begin() + 1, 12);
+	EXPECT_CON_EQ(exp, act);
+	exp.insert(exp.begin() + 2, 15);
+	act.insert(act.begin() + 2, 15);
+	EXPECT_CON_EQ(exp, act);
+}
+
 TEST(vector_assign) {
 	int a[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 	std::vector<int> exp(a, a + 10);

@@ -19,6 +19,7 @@
 #include "exceptdef.h"
 #include "iterator"
 #include "memory.h"
+#include "util.h"
 
 namespace mystl {
 
@@ -422,6 +423,7 @@ typename Vector<T, Alloc>::iterator Vector<T, Alloc>::insert(const_iterator pos,
 		++end_;
 	}
 	else if (end_ != capacity_) {
+		DBG_OUT("insert", "end_ != capacity");
 		// 容量够，插入位置不在末尾
 		auto new_end = end_;	// 记录结尾位置
 		// ？结尾前一个元素构建对象，意义不明

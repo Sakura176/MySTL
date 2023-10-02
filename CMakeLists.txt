@@ -3,7 +3,12 @@ cmake_minimum_required(VERSION 3.1)
 project(MySTL)
 
 # build type
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
+
+# 添加可选的宏定义，根据构建类型设置
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	# -Wno-unused-but-set-variable
