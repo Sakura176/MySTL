@@ -8,6 +8,7 @@
  * @copyright Copyright (c) 2023
  * 
  */
+#pragma once
 
 #include <cstddef>
 #include <cstdlib>

@@ -48,6 +48,7 @@
 		"streambuf": "cpp",
 		"cassert": "cpp",
 		"iomanip": "cpp",
-		"sstream": "cpp"
+		"sstream": "cpp",
+		"list": "cpp"
 	}
 }
