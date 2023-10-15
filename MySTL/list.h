@@ -189,7 +189,7 @@ private:
 	base_ptr node_;
 	size_type size_;
 
-public:		// 构造函数相关
+public:		// 构造、析构函数相关
 	List() { fill_init(0, value_type()); };
 	List(size_type count) { fill_init(count, value_type()); }
 	List(size_type count, const T& value) { fill_init(count, value); }
@@ -201,16 +201,39 @@ public:		// 构造函数相关
 	}
 	List(std::initializer_list<T> init) { copy_init(init.begin(), init.end()); }
 
-public:		// 迭代器相关
-	iterator begin() { return node_->next; }
-	const_iterator begin() const { return node_->next; }
+	~List() { 
+		clear();
+		node_alloc::deallocate(node_->as_node());
+		node_ = nullptr;
+		size_ = 0;
+	 }
 
-	iterator end() { return node_; }
-	const_iterator end() const { return node_; }
+	List& operator=(const List& rhs);
+	List& operator=(List&& rhs);
+	List& operator=(std::initializer_list<T> ilist);
+
+public:
+	reference front() { return node_->next->as_node()->value; }
+	const_reference front() const { return static_cast<const_reference>(node_->next->as_node()->value); }
+
+	reference back() { return node_->prev->as_node()->value; }
+	const_reference back() const { return static_cast<const_reference>(node_->prev->as_node()->value); }
+
+public:		// 迭代器相关
+	iterator begin() { return list_iterator<T>(node_->next); }
+	const_iterator begin() const { return list_const_iterator<T>(node_->next); }
+
+	iterator end() { return list_iterator<T>(node_); }
+	const_iterator end() const { return list_const_iterator<T>(node_); }
 
 public:
 	// 容量相关
 	size_type size() const { return size_; }
+
+	bool empty() const { return size_ == 0; }
+
+public:			// 容器修改相关
+	void clear();
 
 private:
 	node_ptr create_node(const T& value);
@@ -223,6 +246,61 @@ private:
 	void link_nodes_at_front(base_ptr first, base_ptr last);
 	void link_nodes_at_back(base_ptr first, base_ptr last);
 };
+
+template <class T>
+inline List<T> &List<T>::operator=(const List &rhs)
+{
+	clear();
+	node_ = base_alloc::allocate(1);
+	node_->unlink();
+	size_ = rhs.size();
+	try {
+		for (auto cur = rhs.begin(); cur != rhs.end(); ++cur) {
+			auto node = create_node(*cur);
+			// 在后方插入节点
+			link_nodes_at_back(node->as_base(), node->as_base());
+		}
+	}
+	catch (...) {
+		base_alloc::deallocate(node_);
+		node_ = nullptr;
+		throw;
+	}
+	return *this;
+}
+
+template <class T>
+inline List<T> &List<T>::operator=(List &&rhs)
+{
+	node_ = rhs.node_;
+	size_ = rhs.size();
+	
+	return *this;
+}
+
+template <class T>
+inline List<T> &List<T>::operator=(std::initializer_list<T> ilist)
+{
+	clear();
+	copy_init(ilist.begin(), ilist.end());
+
+	return *this;
+}
+
+template <class T>
+void List<T>::clear()
+{
+	if(node_) {
+			auto cur = node_->next;
+			for(base_ptr next = cur->next; cur != node_; cur = next, next = cur->next) {
+				// 销毁节点
+				data_alloc::destroy(mystl::address_of(cur->as_node()->value));
+				node_alloc::deallocate(cur->as_node());
+			}
+			node_->unlink();
+			size_ = 0;
+		}
+}
 
 template <class T>
 typename List<T>::node_ptr List<T>::create_node(const T& value) {
@@ -290,7 +368,7 @@ template <class T>
 void List<T>::link_nodes_at_back(base_ptr first, base_ptr last) {
 	last->next = node_;
 	first->prev = node_->prev;
-	first->prev->next = first;
+	node_->prev->next = first;
 	node_->prev = last;
 }
 }
