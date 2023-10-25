@@ -92,6 +92,80 @@ TEST(list_operator3) {
 	EXPECT_CON_EQ(exp, act);
 }
 
+TEST(list_assign1) {
+	std::list<int> exp({1, 3, 9});
+	mystl::List<int> act({1, 3, 9});
+	exp.assign(5, 11);
+	act.assign(5, 11);
+	EXPECT_CON_EQ(exp, act);
+}
+
+TEST(list_assign2) {
+	std::list<int> exp({3, 7, 9});
+	mystl::List<int> act({3, 7, 9});
+	exp.assign({1, 3, 7, 9, 12});
+	act.assign({1, 3, 7, 9, 12});
+	EXPECT_CON_EQ(exp, act);
+}
+
+// TEST(list_assign3) {
+// 	std::list<int> exp_temp({1, 3, 7, 9, 12});
+// 	mystl::List<int> act_temp({1, 3, 7, 9, 12});
+// 	std::list<int> exp({3, 7, 9});
+// 	mystl::List<int> act({3, 7, 9});
+// 	exp.assign(exp_temp.begin(), exp_temp.end());
+// 	act.assign(act_temp.begin(), act_temp.end());
+// 	EXPECT_CON_EQ(exp, act);
+// }
+
+TEST(list_insert1) {
+	std::list<int> exp({1, 3, 9});
+	mystl::List<int> act({1, 3, 9});
+	exp.insert(++exp.begin(), 12);
+	act.insert(++act.begin(), 12);
+	EXPECT_CON_EQ(exp, act);
+}
+
+TEST(list_insert2) {
+	std::list<int> exp({1, 3, 9});
+	mystl::List<int> act({1, 3, 9});
+	exp.insert(++exp.begin(), 3, 12);
+	act.insert(++act.begin(), 3, 12);
+	EXPECT_CON_EQ(exp, act);
+}
+
+TEST(list_push_back) {
+	std::list<int> exp({1, 3, 9});
+	mystl::List<int> act({1, 3, 9});
+	exp.push_back(5);
+	act.push_back(5);
+	EXPECT_CON_EQ(exp, act);
+}
+
+TEST(list_push_front) {
+	std::list<int> exp({1, 3, 9});
+	mystl::List<int> act({1, 3, 9});
+	exp.push_front(5);
+	act.push_front(5);
+	EXPECT_CON_EQ(exp, act);
+}
+
+TEST(list_pop_back) {
+	std::list<int> exp({1, 3, 9});
+	mystl::List<int> act({1, 3, 9});
+	exp.pop_back();
+	act.pop_back();
+	EXPECT_CON_EQ(exp, act);
+}
+
+TEST(list_pop_front) {
+	std::list<int> exp({1, 3, 9});
+	mystl::List<int> act({1, 3, 9});
+	exp.pop_front();
+	act.pop_front();
+	EXPECT_CON_EQ(exp, act);
+}
+
 TEST(list_front) {
 	std::list<int> exp({3, 7, 9});
 	mystl::List<int> act({3, 7, 9});
@@ -112,11 +186,6 @@ void list_test() {
 	std::list<int> exp({1, 3, 5, 7});
 	auto cur = exp.end();
 
-	std::cout << *(--cur) << std::endl;
-
-	auto act_it = act.end();
-
-	
 	FUN_VALUE(exp.front());
 	FUN_VALUE(exp.back());
 	FUN_VALUE(act.front());
