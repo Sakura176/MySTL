@@ -49,6 +49,12 @@
 		"cassert": "cpp",
 		"iomanip": "cpp",
 		"sstream": "cpp",
-		"list": "cpp"
+		"list": "cpp",
+		"any": "cpp",
+		"map": "cpp",
+		"set": "cpp",
+		"optional": "cpp",
+		"cinttypes": "cpp",
+		"variant": "cpp"
 	}
 }

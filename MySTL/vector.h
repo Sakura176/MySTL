@@ -530,8 +530,8 @@ Vector<T, Alloc>::fill_insert(iterator pos, size_type count, const value_type &v
 	// 容量足够插入所有元素
 	if (capacity_ - end_ >= count) {
 		// 插入位置后的元素数量
-		const size_type after_pos = end_ - pos;
-		auto old_end = end_;	// 记录结束位置
+		// const size_type after_pos = end_ - pos;
+		// auto old_end = end_;	// 记录结束位置
 
 		// 移动后续位置元素
 		mystl::uninitialized_move(end_ - n, end_, end_);

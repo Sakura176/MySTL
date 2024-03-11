@@ -208,8 +208,18 @@ public:		// 构造、析构函数相关
 		size_ = 0;
 	 }
 
-	List& operator=(const List& rhs);
-	List& operator=(List&& rhs);
+	List& operator=(const List& rhs){
+		if (this != &rhs) {
+			assign(rhs.begin(), rhs.end());
+		}
+		return *this;
+	}
+	List& operator=(List&& rhs) noexcept {
+		clear();
+		splice(end(), rhs);
+		
+		return *this;
+	}
 	List& operator=(std::initializer_list<T> ilist);
 
 	/**
@@ -223,6 +233,11 @@ public:		// 构造、析构函数相关
 	template <class InputIt, typename std::enable_if<
 	  mystl::is_input_iterator<InputIt>::value, int>::type = 0>
 	void assign(InputIt first, InputIt last);
+
+public:		// 容器操作
+	void splice(const_iterator pos, List& other);
+	void splice(const_iterator pos, List& other, const_iterator it);
+	void splice(const_iterator pos, List& other, const_iterator first, const_iterator last);
 	
 public:
 	reference front() { return node_->next->as_node()->value; }
@@ -260,8 +275,11 @@ public:			// 容器修改相关
 
 
 	iterator insert(const_iterator pos, const value_type& value);
-	//iterator insert(const_iterator pos, T&& value);
+	iterator insert(const_iterator pos, value_type&& value);
 	iterator insert(const_iterator pos, size_type count, const value_type& value);
+	template <class Iter, typename std::enable_if<
+	  mystl::is_input_iterator<Iter>::value, int>::type = 0 >
+	iterator insert(const_iterator pos, Iter first, Iter last);
 
 	void resize(size_type count);
 	void resize(size_type count, const value_type& value);
@@ -269,14 +287,22 @@ public:			// 容器修改相关
 	void swap(List& other) noexcept;
 
 private:
-	node_ptr create_node(const T& value);
+	template <class ...Args>
+	node_ptr create_node(Args&& ...args);
 
 	void destroy_node(node_ptr node);
 
-	void fill_init(size_type count, const T& value);
+	void fill_assign(size_type n, const T& value);
+	template <class Iter>
+	void copy_assign(Iter first, Iter last);
 
+	void fill_init(size_type count, const T& value);
 	template <class Iter>
 	void copy_init(Iter first, Iter last);
+
+	iterator fill_insert(const_iterator pos, size_type n, const T& value);
+
+	iterator link_iter_node(const_iterator pos, base_ptr node);
 
 	void link_nodes_at_front(base_ptr first, base_ptr last);
 	void link_nodes_at_back(base_ptr first, base_ptr last);
@@ -294,39 +320,7 @@ private:
 };
 
 template <class T>
-inline List<T> &List<T>::operator=(const List &rhs)
-{
-	clear();
-	node_ = base_alloc::allocate(1);
-	node_->unlink();
-	size_ = rhs.size();
-	try {
-		for (auto cur = rhs.begin(); cur != rhs.end(); ++cur) {
-			auto node = create_node(*cur);
-			// 在后方插入节点
-			link_nodes_at_back(node->as_base(), node->as_base());
-		}
-	}
-	catch (...) {
-		base_alloc::deallocate(node_);
-		node_ = nullptr;
-		throw;
-	}
-	return *this;
-}
-
-template <class T>
-inline List<T> &List<T>::operator=(List &&rhs)
-{
-	node_ = rhs.node_;
-	size_ = rhs.size();
-	
-	return *this;
-}
-
-template <class T>
-inline List<T> &List<T>::operator=(std::initializer_list<T> ilist)
-{
+inline List<T> &List<T>::operator=(std::initializer_list<T> ilist) {
 	clear();
 	copy_init(ilist.begin(), ilist.end());
 
@@ -334,42 +328,76 @@ inline List<T> &List<T>::operator=(std::initializer_list<T> ilist)
 }
 
 template <class T>
-inline void List<T>::assign(size_type count, const value_type& value)
-{
+inline void List<T>::assign(size_type count, const value_type& value) {
 	// TODO 待优化，在空间已申请的情况下，修改元素值是否更便捷
-	clear();
-	fill_init(count, value);
+	fill_assign(count, value);
 }
 
 template <class T>
-inline void List<T>::assign(std::initializer_list<T> ilist)
-{
-	clear();
-	copy_init(ilist.begin(), ilist.end());
+inline void List<T>::assign(std::initializer_list<T> ilist) {
+	copy_assign(ilist.begin(), ilist.end());
 }
 
-// template <class T>
-// template <class InputIt, typename std::enable_if<
-// 	  mystl::is_input_iterator<InputIt>::value, int>::type>
-// inline void List<T>::assign(InputIt first, InputIt last)
-// {
-// 	clear();
-// 	copy_init(first, last);
-// }
+template <class T>
+template <class InputIt, typename std::enable_if<
+	  mystl::is_input_iterator<InputIt>::value, int>::type>
+inline void List<T>::assign(InputIt first, InputIt last) {
+	copy_assign(first, last);
+}
+
+template <class T>
+void List<T>::splice(const_iterator pos, List &other) {
+	if (!other.empty())	{
+		auto oth_f = other.node_->next;
+		auto oth_l = other.node_->prev;
+
+		other.unlink_nodes(oth_f, oth_l);
+		link_nodes(pos.node_, oth_f, oth_l);
+
+		size_ += other.size_;
+		other.size_ = 0;
+	}
+}
 
 template <class T>
 void List<T>::clear()
 {
 	if(node_) {
-			auto cur = node_->next;
-			for(base_ptr next = cur->next; cur != node_; cur = next, next = cur->next) {
-				// 销毁节点
-				data_alloc::destroy(mystl::address_of(cur->as_node()->value));
-				node_alloc::deallocate(cur->as_node());
-			}
-			node_->unlink();
-			size_ = 0;
+		auto cur = node_->next;
+		for(base_ptr next = cur->next; cur != node_; cur = next, next = cur->next) {
+			// 销毁节点
+			data_alloc::destroy(mystl::address_of(cur->as_node()->value));
+			node_alloc::deallocate(cur->as_node());
 		}
+		node_->unlink();
+		size_ = 0;
+	}
+}
+
+template <class T>
+List<T>::iterator List<T>::erase(const_iterator pos) {
+	auto node = pos.node_;
+	auto next = node->next;
+	unlink_nodes(node, node);
+	destroy_node(node->as_node());
+	--size_;
+	return iterator(next);
+}
+
+template <class T>
+List<T>::iterator List<T>::erase(const_iterator first, const_iterator last) {
+	if (first != last) {
+		// 断开 [first, last) 间的节点
+		unlink_nodes(first.node_, last.node_->prev);
+		while (first != last) {
+			// 释放节点
+			auto node = first.node_;
+			++first;
+			destroy_node(node->as_node());
+			--size_;
+		}
+	}
+	return iterator(last.node_);
 }
 
 template <class T>
@@ -422,30 +450,44 @@ template <class T>
 inline typename List<T>::iterator List<T>::insert(const_iterator pos, const value_type &value)
 {
 	auto node = create_node(value);
-	link_nodes(pos.node_, node->as_base(), node->as_base());
+	++size_;
+	return link_iter_node(pos, node->as_base());
+}
 
-	return iterator(node);
+template <class T>
+inline typename List<T>::iterator List<T>::insert(const_iterator pos, value_type&& value)
+{
+	auto node = create_node(value);
+	++size_;
+	return link_iter_node(pos, node->as_base());
 }
 
 template <class T>
 inline typename List<T>::iterator 
 List<T>::insert(const_iterator pos, size_type count, const value_type& value)
 {
-	iterator xpos(pos.node_);
-	for(int i = 0; i < count; ++i)
-	{
-		auto node = create_node(value);
-		link_nodes(xpos.node_, node->as_base(), node->as_base());
-	}
-
-	return ++xpos;
+	return fill_insert(pos, count, value);
 }
 
 template <class T>
-typename List<T>::node_ptr List<T>::create_node(const T& value) {
+template <class Iter, typename std::enable_if<
+	  mystl::is_input_iterator<Iter>::value, int>::type>
+inline typename List<T>::iterator 
+List<T>::insert(const_iterator pos, Iter first, Iter last) {
+	iterator xpos(pos.node_);
+	for(; first != last; ++first) {
+		auto node = create_node(*first);
+		link_nodes(xpos.node_, node->as_base(), node->as_base());
+	}
+	return xpos;
+}
+
+template <class T>
+template <class ...Args>
+typename List<T>::node_ptr List<T>::create_node(Args&& ...args) {
 	node_ptr tmp = node_alloc::allocate(1);
 	try {
-		data_alloc::construct(mystl::address_of(tmp->value), value);
+		data_alloc::construct(mystl::address_of(tmp->value), std::forward<Args>(args)...);
 		tmp->prev = nullptr;
 		tmp->next = nullptr;
 	}
@@ -461,6 +503,35 @@ inline void List<T>::destroy_node(node_ptr node)
 {
 	data_alloc::destroy(mystl::address_of(node->value));
 	node_alloc::deallocate(node);
+}
+
+template <class T>
+void List<T>::fill_assign(size_type n, const T& value) {
+	auto i = begin();
+	auto e = end();
+	for (; n > 0 && i != e; --n, ++i) {
+		*i = value;
+	}
+	if (n > 0) {
+		insert(e, n, value);
+	} else {
+		erase(i, e);
+	}
+}
+
+template <class T>
+template <class Iter>
+void List<T>::copy_assign(Iter first, Iter last) {
+	auto i = begin();
+	auto e = end();
+	for (; first != last && i != e; ++first, ++i) {
+		*i = *first;
+	}
+	if (first == last) {
+		erase(i, e);
+	} else {
+		insert(e, first, last);
+	}
 }
 
 template <class T>
@@ -505,7 +576,55 @@ void List<T>::copy_init(Iter first, Iter last)
 }
 
 template <class T>
-void List<T>::link_nodes_at_front(base_ptr first, base_ptr last) {
+inline List<T>::iterator List<T>::fill_insert(const_iterator pos, size_type n, const T &value)
+{
+	// 记录插入位置
+	iterator xpos(pos.node_);
+	if (n != 0) {
+		// 记录插入节点总数
+		const auto add_size = n;
+		auto node = create_node(value);
+		node->prev = nullptr;
+		xpos = iterator(node);
+		iterator end = xpos;
+		try {
+			for (--n; n > 0; --n, ++end) {
+				auto next = create_node(value);
+				end.node_->next = next->as_base();
+				next->prev = end.node_;
+			}
+			size_ += add_size;
+		} catch (...) {
+			auto enode = end.node_;
+			while (true) {
+				auto prev = enode->prev;
+				destroy_node(enode->as_node());
+				if (prev == nullptr)
+					break;
+				enode = prev;
+			}
+			throw;
+		}
+		link_nodes(pos.node_, xpos.node_, end.node_);
+	}
+	return xpos;
+}
+
+template <class T>
+List<T>::iterator List<T>::link_iter_node(const_iterator pos, base_ptr node) {
+	if (pos == node_->next) {
+		link_nodes_at_front(node, node);
+	} else if (pos == node_) {
+		link_nodes_at_back(node, node);
+	} else {
+		link_nodes(pos.node_, node, node);
+	}
+	return iterator(node);
+}
+
+template <class T>
+void List<T>::link_nodes_at_front(base_ptr first, base_ptr last)
+{
 	first->prev = node_;
 	last->next = node_->next;
 	node_->next->prev = last;

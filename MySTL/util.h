@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <stdio.h>
 
 #include "type_traits.h"
 
@@ -11,8 +12,8 @@ namespace mystl {
 #endif
 
 // move 移动指针
-template <class T>
-typename std::remove_reference<T>::type&& move(T&& arg) {
+template <typename T>
+constexpr typename std::remove_reference<T>::type&& move(T&& arg) {
 	return static_cast<typename std::remove_reference<T>::type&&>(arg);
 }
 
