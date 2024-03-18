@@ -10,7 +10,9 @@ add_executable(stl_test
 	algorithm_test.cpp
 	vector_test.cpp
 	list_test.cpp
+	iterator_test.cpp
 )
+
 
 # 链接 GTest 库和你的源文件
 target_link_libraries(stl_test PRIVATE GTest::GTest GTest::Main pthread)

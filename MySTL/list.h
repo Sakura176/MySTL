@@ -19,9 +19,18 @@
 
 namespace mystl {
 
+// 节点定义
 template <class T> struct list_node_base;
 template <class T> struct list_node;
 
+//  ？ 该操作原因未知
+/**
+ * @brief 节点萃取器，该操作优点暂未理解
+ * 1. 类型抽象：在不同场景下灵活使用指针，无需指定具体类型提升代码的可读性和可维护性
+ * 2. 解耦：
+ * 
+ * @tparam T 
+ */
 template <class T>
 struct node_traits {
 	using base_ptr = list_node_base<T>*;
