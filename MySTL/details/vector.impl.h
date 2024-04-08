@@ -129,11 +129,11 @@ void Vector<T, Alloc>::push_back(const value_type& value) {
 	}
 }
 
-template<class T, class Alloc>
-void Vector<T, Alloc>::emplace_back(const value_type&& value) {
-	std::vector<int> vec;
-	vec.emplace_back();
-}
+// template<class T, class Alloc>
+// void Vector<T, Alloc>::emplace_back(const value_type&& value) {
+// 	std::vector<int> vec;
+// 	vec.emplace_back();
+// }
 
 template<class T, class Alloc>
 inline void Vector<T, Alloc>::pop_back() {
@@ -141,7 +141,8 @@ inline void Vector<T, Alloc>::pop_back() {
 }
 
 template <class T, class Alloc>
-typename Vector<T, Alloc>::iterator Vector<T, Alloc>::insert(const_iterator pos, const T& value) {
+typename Vector<T, Alloc>::iterator 
+Vector<T, Alloc>::insert(const_iterator pos, const T& value) {
 	MYSTL_ASSERT(pos >= begin() && pos <= end());
 	iterator xpos = const_cast<iterator>(pos);
 	const size_type n = pos - begin_;
