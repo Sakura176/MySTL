@@ -1,6 +1,7 @@
-//#include <string>
+#include <string>
 
 #include "unittest.h"
+#include "String.h"
 
 namespace mystl {
 namespace test {
@@ -13,8 +14,11 @@ public:
 
 // 构造函数测试
 TEST_F(StringTest, construct1) {
-	//std::string exp;
-	//EXPECT_TRUE(isSameCon(exp, act));
+	std::string exp;
+	mystl::string act;
+	EXPECT_EQ(exp.size(), act.size());
+	EXPECT_EQ(exp.capacity(), act.capacity());
+	EXPECT_TRUE(isSameCon(exp, act));
 }
 
 TEST_F(StringTest, construct2) {

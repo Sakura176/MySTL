@@ -11,6 +11,7 @@ add_executable(stl_test
 	vector_test.cpp
 	list_test.cpp
 	iterator_test.cpp
+	string_test.cpp
 )
 
 

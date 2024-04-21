@@ -16,14 +16,14 @@ public:
 	using const_iterator 	= const value_type*;
 
 private:
-	iterator _begin;		// 起始指针
-	iterator _end;			// 结束指针
-	iterator _cap;			// 容量指针
+	iterator begin_;		// 起始指针
+	iterator end_;			// 结束指针
+	iterator cap_;			// 容量指针
 
 	using Alloc				= Allocator<char>;
 
 public:
-	string() : _begin(0), _end(0), _cap(0) {};
+	string() : begin_(0), end_(0), cap_(0) {};
 	string(size_type count, value_type ch);
 	string(const string& oth, size_type pos);
 	string(const string& oth, size_type pos, size_type count);
@@ -33,11 +33,18 @@ public:
 	string(InputIt first, InputIt last);
 
 public:
-	size_type size() const noexcept { return mystl::distance(_begin, _end); }
-	size_type length() const noexcept { return mystl::distance(_begin, _end); }
-	size_type capacity() const noexcept { return mystl::distance(_begin, _end); }
+	size_type size() const noexcept { return mystl::distance(begin_, end_); }
+	size_type length() const noexcept { return mystl::distance(begin_, end_); }
+	size_type capacity() const noexcept { return mystl::distance(begin_, cap_); }
+
+public:
+	iterator begin() { return begin_; }
+	iterator end() { return end_; }
+
+private:
+	void init_space(size_type size);
 };
 
 } // namespace mystl
 
-#include "details/vector.impl.h"
+#include "details/String.impl.h"
