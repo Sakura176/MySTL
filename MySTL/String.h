@@ -23,7 +23,7 @@ private:
 	using Alloc				= Allocator<char>;
 
 public:
-	string() : begin_(0), end_(0), cap_(0) {};
+	string();
 	string(size_type count, value_type ch);
 	string(const string& oth, size_type pos);
 	string(const string& oth, size_type pos, size_type count);
@@ -42,7 +42,7 @@ public:
 	iterator end() { return end_; }
 
 private:
-	void init_space(size_type size);
+	void init_space(size_type size, size_type capacity);
 };
 
 } // namespace mystl
