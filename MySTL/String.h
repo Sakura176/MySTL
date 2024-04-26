@@ -25,10 +25,11 @@ private:
 public:
 	string();
 	string(size_type count, value_type ch);
-	string(const string& oth, size_type pos);
-	string(const string& oth, size_type pos, size_type count);
 	string(const char* s);
 	string(const char* s, size_type count);
+	string(const string& oth);
+	string(const string& oth, size_type pos);
+	string(const string& oth, size_type pos, size_type count);
 	template<class InputIt>
 	string(InputIt first, InputIt last);
 
