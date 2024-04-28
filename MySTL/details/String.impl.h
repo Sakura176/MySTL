@@ -26,8 +26,7 @@ string::string(const char* s) {
 	mystl::uninitialized_copy(s, s + strlen(s), begin_);
 }
 
-inline string::string(const char *s, size_type count)
-{
+inline string::string(const char *s, size_type count) {
 	size_type size = mystl::max(count, size_type(INIT_SIZE));
 	// 1. 申请空间
 	init_space(count, size);
@@ -35,8 +34,7 @@ inline string::string(const char *s, size_type count)
 	mystl::uninitialized_copy(s, s + count, begin_);
 }
 
-inline string::string(const string &oth)
-{
+inline string::string(const string &oth) {
 	size_type size = mystl::max(oth.size(), size_type(INIT_SIZE));
 	// 1. 申请空间
 	init_space(oth.size(), size);
@@ -44,13 +42,37 @@ inline string::string(const string &oth)
 	mystl::uninitialized_copy(oth.begin_, oth.end_, begin_);
 }
 
-inline string::string(const string &oth, size_type pos)
-{
+inline string::string(const string &oth, size_type pos) {
 	size_type size = mystl::max(oth.size() - pos, size_type(INIT_SIZE));
 	// 1. 申请空间
 	init_space(oth.size() - pos, size);
 
 	mystl::uninitialized_copy(oth.begin_ + pos, oth.end_, begin_);
+}
+
+inline string::string(const string &oth, size_type pos, size_type count) {
+	size_type temp = mystl::min(count, size_type(oth.size() - pos));
+	size_type size = mystl::max(temp, size_type(INIT_SIZE));
+	// 1. 申请空间
+	init_space(temp, size);
+
+	mystl::uninitialized_copy(oth.begin_ + pos, oth.begin_ + pos + temp, begin_);
+}
+
+template<class InputIt>
+inline string::string(InputIt first, InputIt last) {
+	size_type temp = std::distance(first, last);
+	size_type size = mystl::max(temp, size_type(INIT_SIZE));
+	init_space(temp, size);
+	mystl::uninitialized_copy(first, last, begin_);
+}
+
+inline string::string(std::initializer_list<char> ilist)
+{
+	size_type temp = std::distance(ilist.begin(), ilist.end());
+	size_type size = mystl::max(temp, size_type(INIT_SIZE));
+	init_space(temp, size);
+	mystl::uninitialized_copy(ilist.begin(), ilist.end(), begin_);
 }
 
 void string::init_space(size_type size, size_type capacity) {

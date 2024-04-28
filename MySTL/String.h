@@ -32,6 +32,7 @@ public:
 	string(const string& oth, size_type pos, size_type count);
 	template<class InputIt>
 	string(InputIt first, InputIt last);
+	string(std::initializer_list<char> ilist);
 
 public:
 	size_type size() const noexcept { return mystl::distance(begin_, end_); }

@@ -65,5 +65,23 @@ TEST_F(StringTest, construct6) {
 	EXPECT_TRUE(isSameCon(exp, act));
 }
 
+TEST_F(StringTest, construct7) {
+	std::string ori1("hello world!");
+	std::string exp(ori1.begin(), ori1.end());
+	mystl::string ori2("hello world!");
+	mystl::string act(ori2.begin(), ori2.end());
+	EXPECT_EQ(exp.size(), act.size());
+	EXPECT_EQ(exp.capacity(), act.capacity());
+	EXPECT_TRUE(isSameCon(exp, act));
+}
+
+TEST_F(StringTest, construct8) {
+	std::string exp({'h', 'e', 'l', 'l', 'o'});
+	mystl::string act({'h', 'e', 'l', 'l', 'o'});
+	EXPECT_EQ(exp.size(), act.size());
+	EXPECT_EQ(exp.capacity(), act.capacity());
+	EXPECT_TRUE(isSameCon(exp, act));
+}
+
 } // namespace test
 } // namespace mystl

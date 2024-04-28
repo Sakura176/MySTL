@@ -14,9 +14,14 @@ add_executable(stl_test
 	string_test.cpp
 )
 
+# add_executable(string_test 
+# 	string_test.cpp
+# )
+
 
 # 链接 GTest 库和你的源文件
 target_link_libraries(stl_test PRIVATE GTest::GTest GTest::Main pthread)
+# target_link_libraries(string_test PRIVATE GTest::GTest GTest::Main pthread)
 
 # 分组测试用例
 # set_tests_properties(stl_test PROPERTIES LABELS "Algorithm;Iterator;Vector;List;String")
@@ -27,5 +32,10 @@ target_link_libraries(stl_test PRIVATE GTest::GTest GTest::Main pthread)
 
 gtest_discover_tests(stl_test
                      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
-                     PROPERTIES LABELS "vector;list;string"
+                     PROPERTIES LABELS 
                      )
+
+# gtest_discover_tests(string_test
+#                      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
+#                      PROPERTIES LABELS 
+#                      )
