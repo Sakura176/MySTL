@@ -22,7 +22,7 @@ private:
 
 	using Alloc				= Allocator<char>;
 
-public:
+public:					// 构造函数
 	string();
 	string(size_type count, value_type ch);
 	string(const char* s);
@@ -33,6 +33,15 @@ public:
 	template<class InputIt>
 	string(InputIt first, InputIt last);
 	string(std::initializer_list<char> ilist);
+	string(string&& oth) noexcept;
+public:
+	void assign(const string& oth);
+
+
+public:
+	string operator=(const string& oth);
+	string operator=(string&& oth) noexcept;
+	string operator=(const char* s);
 
 public:
 	size_type size() const noexcept { return mystl::distance(begin_, end_); }
@@ -42,6 +51,9 @@ public:
 public:
 	iterator begin() { return begin_; }
 	iterator end() { return end_; }
+
+	iterator begin() const { return begin_; }
+	iterator end() const { return end_; }
 
 private:
 	void init_space(size_type size, size_type capacity);

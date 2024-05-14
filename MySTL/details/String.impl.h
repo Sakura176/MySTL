@@ -75,6 +75,32 @@ inline string::string(std::initializer_list<char> ilist)
 	mystl::uninitialized_copy(ilist.begin(), ilist.end(), begin_);
 }
 
+inline string::string(string &&oth) noexcept
+{
+	this->begin_ = oth.begin_;
+	this->end_ = oth.end_;
+	this->cap_ = oth.cap_;
+	oth.begin_ = nullptr;
+	oth.end_ = nullptr;
+	oth.cap_ = nullptr;
+}
+
+inline void string::assign(const string &oth)
+{
+	size_t size = oth.size();
+	if (size < capacity())
+	{
+		mystl::uninitialized_copy(oth.begin(), oth.end(), begin_);
+		end_ += size;
+	}
+}
+
+inline string string::operator=(const string &oth)
+{
+	
+    return string();
+}
+
 void string::init_space(size_type size, size_type capacity) {
 	try	{
 		begin_ = Alloc::allocate(size);

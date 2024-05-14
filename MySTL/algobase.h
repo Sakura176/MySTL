@@ -43,7 +43,7 @@ template <class InputIter, class OutputIter>
 OutputIter unchecked_copy_cat(InputIter first, InputIter last, OutputIter result, 
 							  mystl::input_iterator_tag) {
 	// 循环，逐个复制元素
-	DBG_OUT("copy", "input_iterator_tag");
+	//DBG_OUT("copy", "input_iterator_tag");
 	for (; first != last; ++first, ++result) {
 		*result = *first;
 	}
@@ -56,7 +56,7 @@ OutputIter unchecked_copy_cat(InputIter first, InputIter last, OutputIter result
 template <class RandomIter, class OutputIter>
 OutputIter unchecked_copy_cat(RandomIter first, RandomIter last, OutputIter result, 
 							  mystl::random_access_iterator_tag) {
-	DBG_OUT("copy", "random_access_iterator_tag");
+	//DBG_OUT("copy", "random_access_iterator_tag");
 	for (auto n = last - first; n > 0; --n, ++first, ++result) {
 		*result = *first;
 	}
@@ -90,7 +90,7 @@ OutputIter copy(InputIter first, InputIter last, OutputIter result) {
 template <class BidiIter1, class BidiIter2>
 BidiIter2 unchecked_copy_backward_cat(BidiIter1 first, BidiIter1 last, BidiIter2 result, 
 							  mystl::bidirectional_iterator_tag) {
-	DBG_OUT("copy_backward", "bidirectional_iterator_tag");
+	//DBG_OUT("copy_backward", "bidirectional_iterator_tag");
 	while (first != last) {
 		*--result = *--last;
 	}
@@ -109,7 +109,7 @@ BidiIter2 copy_backward(BidiIter1 first, BidiIter1 last, BidiIter2 result) {
 template <class InputIter, class OutputIter>
 OutputIter unchecked_move_cat(InputIter first, InputIter last, OutputIter result
 	, mystl::input_iterator_tag) {
-	DBG_OUT("move", "input_iterator_tag");
+	//DBG_OUT("move", "input_iterator_tag");
 	for (; first != last; ++first, ++result) {
 		*result = mystl::move(*first);
 	}
@@ -119,7 +119,7 @@ OutputIter unchecked_move_cat(InputIter first, InputIter last, OutputIter result
 template <class RandomIter, class OutputIter>
 OutputIter unchecked_move_cat(RandomIter first, RandomIter last, OutputIter result,
 				mystl::random_access_iterator_tag) {
-	DBG_OUT("move", "random_access_iterator_tag");
+	//DBG_OUT("move", "random_access_iterator_tag");
 	for (int n = last - first; n > 0; --n, ++first, ++result) {
 		*result = mystl::move(*first);
 	}

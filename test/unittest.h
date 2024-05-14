@@ -29,13 +29,18 @@ public:
             std::cout << "other.size(): " << other.size() << std::endl;
             return false;
         }
-        for (auto i = origin.begin(), j = other.begin(); i != origin.end(); ++i, ++j) {
+        auto i = origin.begin();
+        auto j = other.begin();
+        while(i != origin.end())
+        {
             if (typeid(*i) != typeid(*j))
             {
                 cout_con(origin);
                 cout_con(other);
                 return false;
             }
+            ++i;
+            ++j;
         }
         return true;
     }
