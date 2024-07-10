@@ -67,16 +67,14 @@ inline string::string(InputIt first, InputIt last) {
 	mystl::uninitialized_copy(first, last, begin_);
 }
 
-inline string::string(std::initializer_list<char> ilist)
-{
+inline string::string(std::initializer_list<char> ilist) {
 	size_type temp = std::distance(ilist.begin(), ilist.end());
 	size_type size = mystl::max(temp, size_type(INIT_SIZE));
 	init_space(temp, size);
 	mystl::uninitialized_copy(ilist.begin(), ilist.end(), begin_);
 }
 
-inline string::string(string &&oth) noexcept
-{
+inline string::string(string &&oth) noexcept {
 	this->begin_ = oth.begin_;
 	this->end_ = oth.end_;
 	this->cap_ = oth.cap_;
@@ -85,13 +83,16 @@ inline string::string(string &&oth) noexcept
 	oth.cap_ = nullptr;
 }
 
-inline void string::assign(const string &oth)
-{
+inline void string::assign(const string &oth) {
 	size_t size = oth.size();
-	if (size < capacity())
-	{
+	// 空间足够，则直接复制
+	if (size < capacity())	{
 		mystl::uninitialized_copy(oth.begin(), oth.end(), begin_);
 		end_ += size;
+	} else {
+		// 申请空间
+		init_space(size, size);
+		mystl::uninitialized_copy(oth.begin(), oth.end(), begin_);
 	}
 }
 

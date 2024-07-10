@@ -93,5 +93,17 @@ TEST_F(StringTest, construct9) {
 	EXPECT_TRUE(isSameCon(exp, act));
 }
 
+TEST_F(StringTest, assign1) {
+	std::string ori1("hello world!");
+	std::string exp;
+	exp.assign(ori1);
+	mystl::string ori2("hello world!");
+	mystl::string act;
+	act.assign(ori2);
+	EXPECT_EQ(exp.size(), act.size());
+	EXPECT_EQ(exp.capacity(), act.capacity());
+	EXPECT_TRUE(isSameCon(exp, act));
+}
+
 } // namespace test
 } // namespace mystl

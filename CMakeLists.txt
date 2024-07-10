@@ -29,5 +29,6 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	endif()
 endif()
 
-enable_testing()
+
 add_subdirectory(${PROJECT_SOURCE_DIR}/test)
+enable_testing()
