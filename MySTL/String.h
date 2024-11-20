@@ -1,6 +1,8 @@
 #pragma once
 
 #include "allocator.h"
+#include "iterator.h"
+#include <iostream>
 
 namespace mystl {
 
@@ -35,7 +37,12 @@ public: // 构造函数
     string(string &&oth) noexcept;
 
 public:
+    void assign(size_type count, value_type ch);
     void assign(string const &oth);
+    void assign(string const &oth, size_type pos, size_type count);
+    void assign(string &&oth);
+    void assign(value_type const *s, size_type count);
+    void assign(value_type const *s);
 
 public:
     string operator=(string const &oth);
@@ -79,4 +86,3 @@ private:
 } // namespace mystl
 
 #include "details/String.impl.h"
-
